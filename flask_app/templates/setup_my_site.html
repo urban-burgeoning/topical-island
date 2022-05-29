@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setting Up - Topical Island</title>
+    <style type="text/css">
+        body {
+            margin: 40px auto;
+            max-width: 650px;
+            line-height: 1.6;
+            font-size: 18px;
+            color:#444;
+            padding:0 10px
+            }
+        h1,h2,h3
+            {
+            line-height:1.2
+            }
+        code {
+              background-color: #eee;
+              border: 1px solid #999;
+              display: block;
+              font-family: Consolas,"courier new";
+              padding: 20px;
+            }
+    </style>
+</head>
+<body>
+<h1>Setting up a website for people who don't know how to set up a website</h1>
+<ol>
+    <li>Buy a virtual private server.</li>
+    <p>I use <a href="https://www.linode.com/">Linode</a>.</p>
+    <p>I don't know why I picked Linode, but I can recommend it - it is easy to use and cheap.</p>
+
+    <li>Purchase a domain name from a registrar.</li>
+    <p>I use <a href="https://domains.google.com/registrar/">Google Domains</a>.</p>
+
+    <li>Move your Google Domain to use Linode's name servers.</li>
+
+
+    <li>Set up domains on Linode to point to your domain name.</li>
+
+    <li>Install docker</li>
+    Follow along <a href="https://www.linode.com/docs/guides/installing-and-using-docker-on-ubuntu-and-debian/">with this link.</a>
+    <br>
+    Run:
+
+    <pre><code>sudo apt update
+sudo apt install apt-transport-https &&
+        ca-certificates &&
+        curl &&
+        gnupg &&
+        lsb-release
+curl -fsSL https://download.docker.com/linux/debian/gpg |
+    sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+    https://download.docker.com/linux/debian $(lsb_release -cs) stable" |
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install packages that we want:
+sudo apt update
+sudo apt install docker-ce
+sudo apt install docker-ce-cli
+sudo apt install containerd.io
+sudo apt install docker-compose
+
+# Start up docker/docker-compose:
+sudo systemctl start docker
+sudo systemctl start docker-compose
+
+# Optionally; you can enable these processes to start
+# on server startup as well:
+sudo systemctl enable docker
+sudo systemctl enable containerd
+sudo systemctl enable docker-compose</code></pre>
+    <li>Set up UFW:</li>
+    <a href="https://www.linode.com/docs/guides/configure-firewall-with-ufw/">Here is a guide for setting up
+        UFW as part of the Linode help library.</a>
+
+    <pre><code># Install UFW:
+sudo apt update
+sudo apt install ufw
+
+# Allow the traffic we want:
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+
+# Otherwise, by default, allow outgoing traffic
+# and deny incoming traffic:
+sudo ufw default allow outgoing
+sudo ufw default deny incoming
+
+# Turn on the firewall:
+sudo ufw enable
+
+# This line shows us the status of our UFW install:
+sudo ufw status</code></pre>
+
+    <p>There is some <a href="https://blog.viktorpetersson.com/2014/11/03/the-dangers-of-ufw-docker.html">weird stuff that can happen with Docker plus UFW</a>.</p>
+
+    <li>Set up https for your nginx container.</li>
+    I'm going to use <a href="https://certbot.eff.org/">Certbot</a>. Honestly, Certbot's help is probably more than thorough enough, but I'll detail the steps here anyway.
+
+    <pre><code># Install the snap package manager:
+sudo apt update
+sudo apt install snapd
+
+# Install the 'core' package from snap:
+sudo snap install core
+sudo snap refresh core
+
+# Install certbot:
+sudo apt remove certbot
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+# Request a certificate:
+    sudo certbot certonly --standalone</code></pre>
+
+    Follow the prompts to request certificates for your domain names.
+
+    It will provide four files. The two you care about are <i>fullchain.pem</i> (the certificate) and <i>privkey.pem</i> (your private key) file. <br><br>
+    You can <a href="https://faun.pub/setting-up-ssl-certificates-for-nginx-in-docker-environ-e7eec5ebb418">follow along
+    with this guide</a> on installing SSL certificates specifically in an nginx docker container.
+
+    By default, it will publish your certificate/key pair to
+    <pre><code>/etc/letsencrypt/live/[your-site-name]/fullchain.pem
+/etc/letsencrypt/live/[your-site-name]/privkey.pem</code></pre>
+
+    Finally, you mount them on a volume as part of your docker-compose file:
+
+    <pre><code>nginx:
+    container_name: nginx
+    restart: always
+    build: ./nginx
+    ports:
+      - "81:81"
+      - "443:443"
+    depends_on:
+      - flask_app
+    volumes:
+      - /etc/letsencrypt/live/www.topicalisland.net/fullchain.pem:/etc/nginx/ssl/certs/fullchain.pem
+      - /etc/letsencrypt/live/www.topicalisland.net/privkey.pem:/etc/nginx/ssl/certs/privkey.pem</code></pre>
+    <br>(though obviously with your site name rather than www.topicalisland.net)
+
+    <br>Then, in your nginx/project.conf file, append these lines to your configuration:
+
+    <pre><code>    listen 81;
+    listen 443 ssl;
+
+    server_name www.topicalisland.net;
+
+    ssl_certificate /etc/nginx/ssl/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/certs/privkey.pem;</pre></code>
+</ol>
+
+You can find the <a href="https://github.com/urban-burgeoning/topical-island">most current version of Topical Island on Github.</a>
+
+<h2>And then what?</h2>
+<ul>
+    <li>You can find the <a href="https://github.com/sladkovm/docker-flask-gunicorn-nginx">code I used to bootstrap up my flask/nginx/docker on Github here</a>,
+        and the <a href="https://sladkovm.github.io/webdev/2017/10/16/Deploying-Plotly-Dash-in-a-Docker-Container-on-Digitital-Ocean.html">corresponding article here</a>.
+    </li>
+    <li>Putting code on the server.</li>
+    <li>Crash course in brutalist CSS.</li>
+    <li>Hosting images, the hard way.</li>
+</ul>
+
+    <h2>"Optional" extras</h2>
+<ul>
+    <li>Set up users?</li>
+    <li>Reverse DNS?</li>
+
+</ul>
+</body>
+</html>
