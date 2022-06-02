@@ -1,32 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>CSS for Brutes</title>
-    <style type="text/css">
-        body {
-            margin: 40px auto;
-            max-width: 650px;
-            line-height: 1.6;
-            font-size: 18px;
-            color:#444;
-            padding:0 10px
-            }
-        h1,h2,h3
-            {
-            line-height:1.2
-            }
-        code {
-              background-color: #eee;
-              border: 1px solid #999;
-              display: block;
-              font-family: Consolas,"courier new";
-              padding: 20px;
-            }
+{% extends "base_template.html" %}
 
-    </style>
-</head>
-<body>
+{% block title_content %}CSS for Brutes{% endblock %}
+
+{% block body_content %}
 <h1>CSS for Brutes</h1>
 <p>First off, <a href="http://bettermotherfuckingwebsite.com/">read this article.</a></p>
 <p>I believe in function over form. But even <i>more</i> than that, I believe in not reinventing the wheel.</p>
@@ -56,5 +32,4 @@ code {
 </pre>
 
 <p>Have fun and load fast.</p>
-</body>
-</html>
+{% endblock %}

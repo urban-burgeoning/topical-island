@@ -1,31 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Setting Up - Topical Island</title>
-    <style type="text/css">
-        body {
-            margin: 40px auto;
-            max-width: 650px;
-            line-height: 1.6;
-            font-size: 18px;
-            color:#444;
-            padding:0 10px
-            }
-        h1,h2,h3
-            {
-            line-height:1.2
-            }
-        code {
-              background-color: #eee;
-              border: 1px solid #999;
-              display: block;
-              font-family: Consolas,"courier new";
-              padding: 20px;
-            }
-    </style>
-</head>
-<body>
+{% extends "base_template.html" %}
+
+{% block title_content %}Setting Up{% endblock %}
+
+{% block body_content %}
 <h1>Setting up a website for people who don't know how to set up a website</h1>
 <ol>
     <li>Buy a virtual private server.</li>
@@ -153,7 +130,7 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
     server_name www.topicalisland.net;
 
     ssl_certificate /etc/nginx/ssl/certs/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/certs/privkey.pem;</pre></code>
+    ssl_certificate_key /etc/nginx/ssl/certs/privkey.pem;</code></pre>
 </ol>
 
 You can find the <a href="https://github.com/urban-burgeoning/topical-island">most current version of Topical Island on Github.</a>
@@ -174,5 +151,4 @@ You can find the <a href="https://github.com/urban-burgeoning/topical-island">mo
     <li>Reverse DNS?</li>
 
 </ul>
-</body>
-</html>
+{% endblock %}
