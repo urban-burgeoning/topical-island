@@ -2,6 +2,7 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def home():
     return render_template("homepage.html")
@@ -10,6 +11,11 @@ def home():
 @app.route('/setup')
 def setup():
     return render_template("setup_my_site.html")
+
+
+@app.route('/github-actions')
+def github_actions():
+    return render_template("github_actions.html")
 
 
 @app.route('/css')
