@@ -1,8 +1,5 @@
 # This is a basic workflow to help you get started with Actions
 name: CICD
-
-env:
-  FOLDER_NAME: topical-island
   
 # Controls when the workflow will run
 on:
@@ -28,8 +25,20 @@ jobs:
         uses: Burnett01/rsync-deployments@5.2
         with:
           switches: -avzr
-          path: .
-          remote_path: /home/devuser/$FOLDER_NAME
+          path: ./src
+          remote_path: /home/devuser/topical-island
           remote_host: ${{ secrets.SERVER_IP_ADDRESS }}
-          remote_user: root
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_user: devuser
+          remote_key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
+                
+      - name: rebuild docker containers over ssh
+        uses: fifsky/ssh-action@v0.0.6
+        with:
+          # Command to execute on the remote server.
+          command: |
+            cd topical-island/src
+            ls -a
+            bash build.sh
+          host: ${{ secrets.SERVER_IP_ADDRESS }}
+          user: devuser
+          key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
