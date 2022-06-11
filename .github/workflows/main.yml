@@ -33,6 +33,17 @@ jobs:
           remote_host: ${{ secrets.SERVER_IP_ADDRESS }}
           remote_user: devuser
           remote_key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
+                
+      - name: rebuild docker containers over ssh
+        uses: fifsky/ssh-action@v0.0.6
+        with:
+          # Command to execute on the remote server.
+          command: |
+            cd $FOLDER_NAME
+            bash build.sh
+          host: ${{ secrets.SERVER_IP_ADDRESS }}
+          user: devuser
+          key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
 
-      - name: rebuild docker containers
-        run: ssh devuser@${{ secrets.SERVER_IP_ADDRESS }} "cd $FOLDER_NAME; bash build.sh"
+   #   - name: rebuild docker containers
+    #    run: ssh devuser@${{ secrets.SERVER_IP_ADDRESS }} "cd $FOLDER_NAME; bash build.sh"
