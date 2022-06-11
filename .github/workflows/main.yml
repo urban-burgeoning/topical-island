@@ -28,8 +28,11 @@ jobs:
         uses: Burnett01/rsync-deployments@5.2
         with:
           switches: -avzr
-          path: .
+          path: ./src
           remote_path: /home/devuser/$FOLDER_NAME
           remote_host: ${{ secrets.SERVER_IP_ADDRESS }}
-          remote_user: root
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_user: devuser
+          remote_key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
+
+      - name: rebuild docker containers
+        run: ssh devuser@${{ secrets.SERVER_IP_ADDRESS }} "cd $FOLDER_NAME; bash build.sh"
