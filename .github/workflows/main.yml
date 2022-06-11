@@ -1,8 +1,5 @@
 # This is a basic workflow to help you get started with Actions
 name: CICD
-
-env:
-  FOLDER_NAME: topical-island
   
 # Controls when the workflow will run
 on:
@@ -29,7 +26,7 @@ jobs:
         with:
           switches: -avzr
           path: ./src
-          remote_path: /home/devuser/$FOLDER_NAME
+          remote_path: /home/devuser/topical-island
           remote_host: ${{ secrets.SERVER_IP_ADDRESS }}
           remote_user: devuser
           remote_key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
@@ -39,12 +36,9 @@ jobs:
         with:
           # Command to execute on the remote server.
           command: |
-            cd $FOLDER_NAME/src
+            cd topical-island/src
             ls -a
             bash build.sh
           host: ${{ secrets.SERVER_IP_ADDRESS }}
           user: devuser
           key: ${{ secrets.DEVUSER_SSH_PRIVATE_KEY }}
-
-   #   - name: rebuild docker containers
-    #    run: ssh devuser@${{ secrets.SERVER_IP_ADDRESS }} "cd $FOLDER_NAME; bash build.sh"
