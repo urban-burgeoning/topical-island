@@ -39,7 +39,7 @@ jobs:
         with:
           # Command to execute on the remote server.
           command: |
-            cd $FOLDER_NAME
+            cd $FOLDER_NAME/src
             ls -a
             bash build.sh
           host: ${{ secrets.SERVER_IP_ADDRESS }}
