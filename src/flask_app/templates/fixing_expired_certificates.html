@@ -1,0 +1,14 @@
+{% extends "base_template.html" %}
+
+{% block title_content %}Past Due{% endblock %}
+
+{% block body_content %}
+<h1>What's all this about certificates?</h1>
+<p>I connected to Topical Island for the first time in a long time and I was greeted by the following:</p>
+
+<img width=100% src="{{ url_for('static', filename='connection_insecure.png') }}" alt="Uh oh"><br>
+
+<p>Well, that's not very good, is it? How do we fix it?</p><br>
+<p>Unfortunately, the suggestion was to turn it off and on again.</p>
+
+{% endblock %}
